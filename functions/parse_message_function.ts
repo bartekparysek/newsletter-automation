@@ -1,12 +1,41 @@
 import { DefineFunction, Schema, SlackFunction } from "deno-slack-sdk/mod.ts";
 
 const channels = [
+  // Dzielnice
   { title: "Dzielnica Bielany", channel: "#dzielnica-bielany" },
   { title: "Dzielnica Wola", channel: "#dzielnica-wola" },
+  { title: "Dzielnica Mokotów", channel: "#dzielnica-mokotów" },
+  { title: "Dzielnica Ochota", channel: "#dzielnica-ochota" },
+  { title: "Dzielnica Praga-Południe", channel: "#dzielnica-praga-południe" },
+  { title: "Dzielnica Praga-Północ", channel: "#dzielnica-praga-północ" },
+  { title: "Dzielnica Śródmieście", channel: "#dzielnica-śródmieście" },
+  { title: "Dzielnica Praga-Centrum", channel: "#dzielnica-praga-centrum" },
+  { title: "Dzielnica Praga-Południe", channel: "#dzielnica-praga-południe" },
+  { title: "Dzielnica Żoliborz", channel: "#dzielnica-żoliborz" },
+  {
+    title: "Dzielnica Wawer-Rembertów-Wesoła",
+    channel: "#dzielnica-wawer-rembertów-wesoła",
+  },
+
+  // Komisje
+  { title: "Komisja Środowiska", channel: "#komisja-srodowiska" },
+  {
+    title: "Komisja Ładu Przestrzennego",
+    channel: "#komisja-ładu-przestrzennego-komłap",
+  },
   {
     title: "Komisja Infrastruktury i Transportu",
     channel: "#komisja-infrastruktury-transportu",
   },
+  {
+    title: "Komisja Senioralna",
+    channel: "#komisja-senioralna",
+  },
+  {
+    title: "Komisja Mieszkalnictwa",
+    channel: "#komisja-mieszkalna",
+  },
+  { title: "Bazarki", channel: "#bazarki" },
 ];
 
 export const ParseMessageFunctionDefinition = DefineFunction({
@@ -28,8 +57,12 @@ export const ParseMessageFunctionDefinition = DefineFunction({
         type: Schema.types.string,
         description: "The timestamp of the message that was reacted to",
       },
+      canvas_id: {
+        type: Schema.types.string,
+        description: "The canvas id where the message will be added",
+      },
     },
-    required: ["channel_id", "message_ts", "channel_name"],
+    required: ["channel_id", "message_ts", "channel_name", "canvas_id"],
   },
   output_parameters: {
     properties: {
@@ -45,8 +78,7 @@ export const ParseMessageFunctionDefinition = DefineFunction({
 export default SlackFunction(
   ParseMessageFunctionDefinition,
   async ({ inputs, client }) => {
-    const { channel_id, message_ts, channel_name } = inputs;
-    console.log(message_ts, channel_id, channel_name);
+    const { channel_id, message_ts, channel_name, canvas_id } = inputs;
 
     try {
       // Fetch the message that was reacted to
@@ -75,7 +107,7 @@ export default SlackFunction(
       }
 
       const sectionResponse = await client.canvases.sections.lookup({
-        canvas_id: "F08EY3TKVC7",
+        canvas_id: canvas_id,
         criteria: {
           section_types: ["h1", "h2"],
           contains_text: channel.title,
@@ -91,7 +123,7 @@ export default SlackFunction(
       const sectionId = sectionResponse.sections[0].id;
 
       const updateSection = await client.canvases.edit({
-        canvas_id: "F08EY3TKVC7",
+        canvas_id: canvas_id,
         changes: [
           {
             operation: "insert_after",
