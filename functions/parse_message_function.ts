@@ -16,6 +16,10 @@ const channels = [
     title: "Dzielnica Wawer-Rembertów-Wesoła",
     channel: "#dzielnica-wawer-rembertów-wesoła",
   },
+  {
+    title: "Dzielnica Bemowo-Ursus-Włochy",
+    channel: "#dzielnica-bemowo-ursus-włochy",
+  },
 
   // Komisje
   { title: "Komisja Środowiska", channel: "#komisja-srodowiska" },
@@ -36,6 +40,8 @@ const channels = [
     channel: "#komisja-mieszkalna",
   },
   { title: "Bazarki", channel: "#bazarki" },
+  { title: "Hałas", channel: "#hałas" },
+  { title: "Stopalkonocą", channel: "#stopalkonocą" },
 ];
 
 export const ParseMessageFunctionDefinition = DefineFunction({
