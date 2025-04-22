@@ -22,7 +22,7 @@ const channels = [
   },
 
   // Komisje
-  { title: "Komisja Środowiska", channel: "#komisja-srodowiska" },
+  { title: "Komisja Środowiska", channel: "#komisja-środowiska" },
   {
     title: "Komisja Ładu Przestrzennego",
     channel: "#komisja-ładu-przestrzennego-komłap",
