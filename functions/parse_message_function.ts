@@ -44,6 +44,30 @@ const channels = [
   { title: "Stopalkonocą", channel: "#stopalkonocą" },
 ];
 
+function convertSlackLinks(text: string): string {
+  // Regular expression to match Slack links
+  const slackLinkRegex = /<([^|>]+)\|?([^>]*)>/g;
+
+  return text.replace(slackLinkRegex, (match, url, title) => {
+    // If there's a title use it, otherwise use the URL
+    const linkText = title || url;
+    return `[${linkText}](${url})`;
+  });
+}
+
+// Function to remove emoji codes
+function removeEmojiCodes(text: string): string {
+  // Regular expression to match emoji codes
+  const emojiCodeRegex = /:[a-z0-9_+-]+:/g;
+
+  return text.replace(emojiCodeRegex, "");
+}
+
+function removeStringConcatenation(text: string): string {
+  // Remove "\n" + patterns
+  return text.replace(/"\n" \+\s*/g, "");
+}
+
 export const ParseMessageFunctionDefinition = DefineFunction({
   callback_id: "parse_message_function",
   title: "Parse Message Function",
@@ -128,6 +152,11 @@ export default SlackFunction(
 
       const sectionId = sectionResponse.sections[0].id;
 
+      let markdownText = JSON.stringify(messageText);
+      markdownText = convertSlackLinks(markdownText);
+      markdownText = removeEmojiCodes(markdownText);
+      markdownText = removeStringConcatenation(markdownText);
+
       const updateSection = await client.canvases.edit({
         canvas_id: canvas_id,
         changes: [
@@ -136,7 +165,7 @@ export default SlackFunction(
             section_id: sectionId,
             document_content: {
               type: "markdown",
-              markdown: `> ${messageText}\n`,
+              markdown: `> ${markdownText}\n`,
             },
           },
         ],
@@ -148,7 +177,7 @@ export default SlackFunction(
         };
       }
 
-      return { outputs: { parsedMsg: messageText } };
+      return { outputs: { parsedMsg: markdownText } };
     } catch (error) {
       return {
         error: `Failed to parse message: ${error}`,
