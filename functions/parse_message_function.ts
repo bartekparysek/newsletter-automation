@@ -37,11 +37,14 @@ const channels = [
   },
   {
     title: "Komisja Mieszkalnictwa",
-    channel: "#komisja-mieszkalna",
+    channel: "#komisja-mieszkania",
   },
   { title: "Bazarki", channel: "#bazarki" },
   { title: "Hałas", channel: "#hałas" },
   { title: "Stopalkonocą", channel: "#stopalkonocą" },
+  { title: "Klub książki", channel: "#klub-książki" },
+  { title: "Kultura", channel: "#kultura" },
+  { title: "Kino z MJN", channel: "#kino-z-mjn" },
 ];
 
 function convertSlackLinks(text: string): string {
