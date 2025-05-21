@@ -66,9 +66,19 @@ function removeEmojiCodes(text: string): string {
   return text.replace(emojiCodeRegex, "");
 }
 
+function removeDashes(text: string): string {
+  // Remove dashes (both en dash and em dash) from the text
+  return text.replace(/[–—-]/g, "");
+}
+
 function removeStringConcatenation(text: string): string {
   // Remove "\n" + patterns
   return text.replace(/"\n" \+\s*/g, "");
+}
+
+function removeNewLines(text: string): string {
+  // Remove new lines from the text
+  return text.replace(/\n/g, "");
 }
 
 export const ParseMessageFunctionDefinition = DefineFunction({
@@ -155,10 +165,9 @@ export default SlackFunction(
 
       const sectionId = sectionResponse.sections[0].id;
 
-      let markdownText = JSON.stringify(messageText);
+      let markdownText = messageText;
       markdownText = convertSlackLinks(markdownText);
-      markdownText = removeEmojiCodes(markdownText);
-      markdownText = removeStringConcatenation(markdownText);
+      markdownText = removeDashes(markdownText);
 
       const updateSection = await client.canvases.edit({
         canvas_id: canvas_id,
@@ -168,7 +177,7 @@ export default SlackFunction(
             section_id: sectionId,
             document_content: {
               type: "markdown",
-              markdown: `> ${markdownText}\n`,
+              markdown: `> ${markdownText} \n `,
             },
           },
         ],
