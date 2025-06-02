@@ -54,7 +54,11 @@ function convertSlackLinks(text: string): string {
   return text.replace(slackLinkRegex, (match, url, title) => {
     // If there's a title use it, otherwise use the URL
     const linkText = title || url;
-    return `[${linkText}](${url})`;
+    if (linkText.startsWith("@")) {
+      return `![](${url})`;
+    } else {
+      return `[${linkText}](${url})`;
+    }
   });
 }
 
@@ -168,6 +172,8 @@ export default SlackFunction(
       let markdownText = messageText;
       markdownText = convertSlackLinks(markdownText);
       markdownText = removeDashes(markdownText);
+
+      console.log(markdownText);
 
       const updateSection = await client.canvases.edit({
         canvas_id: canvas_id,
