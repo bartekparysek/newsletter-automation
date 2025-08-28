@@ -25,7 +25,7 @@ const channels = [
   { title: "Komisja Środowiska", channel: "#komisja-środowiska" },
   {
     title: "Komisja Ładu Przestrzennego",
-    channel: "#komisja-ładu-przestrzennego-komłap",
+    channel: "#komisja-ładu-przestrzennnego-komłap",
   },
   {
     title: "Komisja Infrastruktury i Transportu",
@@ -48,18 +48,25 @@ const channels = [
 ];
 
 function convertSlackLinks(text: string): string {
+  // Replace notification tags with empty string while preserving the rest of the text
+  const notificationRegex = /<!(?:channel|here|everyone)>/g;
+  const textWithoutNotifications = text.replace(notificationRegex, "");
+
   // Regular expression to match Slack links
   const slackLinkRegex = /<([^|>]+)\|?([^>]*)>/g;
 
-  return text.replace(slackLinkRegex, (match, url, title) => {
-    // If there's a title use it, otherwise use the URL
-    const linkText = title || url;
-    if (linkText.startsWith("@")) {
-      return `![](${url})`;
-    } else {
-      return `[${linkText}](${url})`;
-    }
-  });
+  return textWithoutNotifications.replace(
+    slackLinkRegex,
+    (match, url, title) => {
+      // If there's a title use it, otherwise use the URL
+      const linkText = title || url;
+      if (linkText.startsWith("@")) {
+        return `![](${url})`;
+      } else {
+        return `[${linkText}](${url})`;
+      }
+    },
+  );
 }
 
 // Function to remove emoji codes
@@ -149,7 +156,8 @@ export default SlackFunction(
 
       if (!channel) {
         return {
-          error: "Could not find the channel that was reacted to.",
+          error:
+            `Could not find the channel that was reacted to. ${channel_name}`,
         };
       }
 
@@ -169,9 +177,18 @@ export default SlackFunction(
 
       const sectionId = sectionResponse.sections[0].id;
 
+      const forwadedMessage = message.attachments?.[0].text ?? undefined;
+
       let markdownText = messageText;
       markdownText = convertSlackLinks(markdownText);
       markdownText = removeDashes(markdownText);
+
+      let forwardText = forwadedMessage;
+
+      if (forwadedMessage) {
+        forwardText = convertSlackLinks(forwardText);
+        forwardText = removeDashes(forwardText);
+      }
 
       console.log(markdownText);
 
@@ -183,7 +200,9 @@ export default SlackFunction(
             section_id: sectionId,
             document_content: {
               type: "markdown",
-              markdown: `> ${markdownText} \n `,
+              markdown: `> ${markdownText} \n ${
+                forwardText ? forwardText + "\n" : ""
+              }`,
             },
           },
         ],
